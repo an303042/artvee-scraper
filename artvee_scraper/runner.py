@@ -10,7 +10,7 @@ from artvee_scraper.cli.log_arg_group import JsonLogArgGroup
 from artvee_scraper.cli.file_arg_group import JsonFileArgGroup, MultiFileArgGroup
 from artvee_scraper.writer import writer_factory
 
-from .scraper import ArtveeScraper, CategoryType
+from .scraper import ArtveeScraper, CategoryType, ImageSize
 
 
 def parse_cli_args() -> argparse.Namespace:
