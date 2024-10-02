@@ -8,9 +8,9 @@ from logging.handlers import RotatingFileHandler
 
 from artvee_scraper.cli.log_arg_group import JsonLogArgGroup
 from artvee_scraper.cli.file_arg_group import JsonFileArgGroup, MultiFileArgGroup
-from artvee_scraper.writer import writer_factory
+from artvee_scraper.writer.writer_factory import get_instance  # Adjusted import
 
-from .scraper import ArtveeScraper, CategoryType, ImageSize
+from artvee_scraper.scraper import ArtveeScraper, CategoryType, ImageSize
 
 
 def parse_cli_args() -> argparse.Namespace:
@@ -78,6 +78,14 @@ def parse_cli_args() -> argparse.Namespace:
         action="store_true",
         help="Overwrite existing files",
     )
+    # Added argument for image size
+    common_parser.add_argument(
+        "--image-size",
+        dest="image_size",
+        choices=["STANDARD", "MAX"],
+        default="STANDARD",
+        help="Specify the image size to download (STANDARD or MAX). MAX requires a premium account.",
+    )
 
     subparsers = arg_parser.add_subparsers(dest='command')
     subparsers.required = True
@@ -87,33 +95,42 @@ def parse_cli_args() -> argparse.Namespace:
     JsonFileArgGroup(subparsers, parents=[common_parser]).register()
     MultiFileArgGroup(subparsers, parents=[common_parser]).register()
 
-    return arg_parser.parse_args()
+    args = arg_parser.parse_args()
+
+    # Argument validation to ensure that either --category or --url is provided
+    if not args.categories and not args.page_urls:
+        arg_parser.error("You must specify at least one category or URL to scrape.")
+
+    return args
 
 
 def get_logger(args: argparse.Namespace) -> logging.Logger:
-    handlers = None
-    if hasattr(args, 'log_dir') and args.log_dir:
-        log_file = f"{args.log_dir}{os.path.sep}artvee_scraper.log"
-        log_max_bytes = args.log_max_size_mb * pow(1024, 2)
+    logger = logging.getLogger("artvee-scraper")
 
-        rotating_file_appender = RotatingFileHandler(
-            log_file,
-            mode="a",
-            maxBytes=log_max_bytes,
-            backupCount=args.log_max_backups,
-            encoding=None,
-            delay=0,
+    if not logger.handlers:
+        handlers = None
+        if hasattr(args, 'log_dir') and args.log_dir:
+            log_file = f"{args.log_dir}{os.path.sep}artvee_scraper.log"
+            log_max_bytes = args.log_max_size_mb * pow(1024, 2)
+
+            rotating_file_appender = RotatingFileHandler(
+                log_file,
+                mode="a",
+                maxBytes=log_max_bytes,
+                backupCount=args.log_max_backups,
+                encoding=None,
+                delay=0,
+            )
+            handlers = [rotating_file_appender]
+
+        logging.basicConfig(
+            level=getattr(logging, args.log_level),
+            format="%(asctime)s.%(msecs)03d %(levelname)s [%(threadName)s] %(module)s.%(funcName)s(%(lineno)d) | %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+            handlers=handlers,
         )
-        handlers = [rotating_file_appender]
 
-    logging.basicConfig(
-        level=getattr(logging, args.log_level),
-        format="%(asctime)s.%(msecs)03d %(levelname)s [%(threadName)s] %(module)s.%(funcName)s(%(lineno)d) | %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-        handlers=handlers,
-    )
-
-    return logging.getLogger("artvee-scraper")
+    return logger
 
 
 def main():
@@ -121,7 +138,7 @@ def main():
     logger = get_logger(args)
 
     logger.debug("Parsed command line arguments: %s", vars(args))
-    writer = writer_factory.get_instance(args.command, args)
+    writer = get_instance(args.command, args)  # Adjusted function call
 
     # Handle categories
     if hasattr(args, 'categories') and args.categories:
@@ -133,7 +150,7 @@ def main():
     if hasattr(args, 'page_urls') and args.page_urls:
         categories = None
 
-    image_size = ImageSize.STANDARD  # or ImageSize.MAX, adjust as needed, MAX requires premium account
+    image_size = ImageSize[args.image_size]  # Use image size from arguments
 
     scraper = ArtveeScraper(
         writer,
@@ -147,9 +164,11 @@ def main():
         with scraper as s:
             s.start()
     except KeyboardInterrupt as exc:
-        raise SystemExit(
-            "Keyboard interrupt detected; shutting down immediately..."
-        ) from exc
+        sys.exit("Keyboard interrupt detected; shutting down immediately...")
+    except Exception as exc:
+        logger.error("An unexpected error occurred: %s", exc, exc_info=True)
+        sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
