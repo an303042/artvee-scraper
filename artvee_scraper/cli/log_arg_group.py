@@ -42,4 +42,4 @@ class JsonLogArgGroup(ArgGroup):
             action="store_true",
             help="Include image bytes in the output",
         )
-        # Do not add common arguments here; they are handled by the parent parser
+        # Common arguments are handled by the parent parser
