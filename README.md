@@ -1,7 +1,100 @@
 # artvee-scraper
 
- **artvee-scraper** is an easy to use command line utility for fetching public domain artwork from https://www.artvee.com.
+**artvee-scraper** is an easy-to-use command-line utility for fetching public domain artwork from [Artvee](https://www.artvee.com). This project is a fork of the original `artvee-scraper` with additional enhancements and installer scripts to streamline the setup process.
 
+---
+
+## **Quick Start**
+
+Follow these simple steps to get `artvee-scraper` up and running on your system.
+
+### **1. Prerequisites**
+
+Ensure that you have the following installed on your system:
+
+- **Python 3.8+**: [Download Python](https://www.python.org/downloads/)
+- **Git**: [Download Git](https://git-scm.com/downloads)
+
+### **2. Clone the Repository**
+
+Open your terminal or command prompt and clone the `artvee-scraper` repository:
+
+~~~bash
+git clone https://github.com/yourusername/artvee-scraper.git
+cd artvee-scraper
+~~~
+
+*Note: Replace `yourusername` with the actual GitHub username if different.*
+
+### **3. Run the Installer**
+
+Depending on your operating system, execute the appropriate installer script to set up the virtual environment and install dependencies.
+
+#### **Windows**
+
+Double-click the `install.bat` file or run the following command in your command prompt:
+
+~~~batch
+install.bat
+~~~
+
+#### **Unix/Linux/macOS**
+
+Make the installer executable and run it:
+
+~~~bash
+chmod +x install.sh
+./install.sh
+~~~
+
+### **4. Activate the Virtual Environment**
+
+After installation, activate the virtual environment to start using `artvee-scraper`.
+
+#### **Windows**
+
+~~~batch
+venv\Scripts\activate
+~~~
+
+#### **Unix/Linux/macOS**
+
+~~~bash
+source venv/bin/activate
+~~~
+
+*Your prompt should now indicate that the virtual environment is active, e.g., `(venv)`.*
+
+### **5. Use the Scraper**
+
+With the virtual environment activated, you can now use the `artvee-scraper` command directly.
+
+#### **Example: Scrape a Specific URL**
+
+~~~bash
+artvee-scraper file-multi metadata_dir images_dir --url https://artvee.com/books/tsuki-no-hyakushi-one-hundred-aspects-of-the-moon/
+~~~
+
+- **`file-multi`**: Subcommand to write image and metadata as separate files.
+- **`metadata_dir`**: Directory to save metadata files.
+- **`images_dir`**: Directory to save image files.
+- **`--url`**: Specifies the URL to scrape.
+
+#### **Example: Scrape a Category**
+
+~~~bash
+artvee-scraper file-multi metadata_dir images_dir --category abstract
+~~~
+
+- **`--category abstract`**: Scrapes the "abstract" category.
+
+#### **View Help**
+
+~~~bash
+artvee-scraper --help
+~~~
+
+---
 
 **TL;DR**
 
