@@ -95,22 +95,13 @@ artvee-scraper --help
 
 ---
 
+# Original Documentation
+
 - [Artvee Web-scraper](#artvee-scraper)
   - [Installation](#installation)
   - [Synopsis](#synopsis)
   - [Examples](#examples)
   - [Available Commands](#available-commands)
-
-## Change Log
-
-### Version 1.1.0 (2023-10-01)
-
-- **Added**: Support for scraping specific URLs with the `--url` argument.
-- **Improved**: Pagination handling for specified URLs, ensuring all pages under a URL are scraped.
-- **Fixed**: Resolved `argparse.ArgumentError` due to conflicting option strings.
-- **Updated**: Command-line interface to accept URL inputs directly, enhancing usability.
-
----
 
 ## Installation
 
