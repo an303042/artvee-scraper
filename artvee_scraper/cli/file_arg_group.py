@@ -1,15 +1,16 @@
+# file_arg_group.py
+
 import argparse
 
 from artvee_scraper.writer.writer_factory import WriterType
-
-from .arg_group import ArgGroup, IsDirAction, IsInRangeAction
+from artvee_scraper.cli.arg_group import ArgGroup, IsDirAction, IsInRangeAction
 
 
 class JsonFileArgGroup(ArgGroup):
-    """The group of command line arguments associated with the `JsonFileWriter`"""
+    """The group of command line arguments associated with the `JsonFileWriter`."""
 
-    def __init__(self, subparsers: argparse._SubParsersAction) -> None:
-        super().__init__(subparsers)
+    def __init__(self, subparsers: argparse._SubParsersAction, parents=None) -> None:
+        super().__init__(subparsers, parents=parents)
 
     def get_name(self) -> str:
         return WriterType.JSON_FILE.writer_name
@@ -19,7 +20,9 @@ class JsonFileArgGroup(ArgGroup):
 
     def add_arguments(self, subparser: argparse.ArgumentParser) -> None:
         subparser.add_argument(
-            "dir_path", action=IsDirAction, help="JSON file output directory"
+            "dir_path",
+            action=IsDirAction,
+            help="JSON file output directory",
         )
         subparser.add_argument(
             "--space-level",
@@ -38,19 +41,14 @@ class JsonFileArgGroup(ArgGroup):
             action="store_true",
             help="Sort JSON keys in alphabetical order",
         )
-        subparser.add_argument(
-            "--overwrite-existing",
-            dest="overwrite_existing",
-            action="store_true",
-            help="Overwrite existing files",
-        )
+        # Do not add common arguments here; they are handled by the parent parser
 
 
 class MultiFileArgGroup(ArgGroup):
-    """The group of command line arguments associated with the `MultiFileWriter`"""
+    """The group of command line arguments associated with the `MultiFileWriter`."""
 
-    def __init__(self, subparsers: argparse._SubParsersAction) -> None:
-        super().__init__(subparsers)
+    def __init__(self, subparsers: argparse._SubParsersAction, parents=None) -> None:
+        super().__init__(subparsers, parents=parents)
 
     def get_name(self) -> str:
         return WriterType.MULTI_FILE.writer_name
@@ -86,9 +84,4 @@ class MultiFileArgGroup(ArgGroup):
             action="store_true",
             help="Sort JSON keys in alphabetical order",
         )
-        subparser.add_argument(
-            "--overwrite-existing",
-            dest="overwrite_existing",
-            action="store_true",
-            help="Overwrite existing files",
-        )
+        # Do not add common arguments here; they are handled by the parent parser

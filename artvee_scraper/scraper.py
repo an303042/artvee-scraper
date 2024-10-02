@@ -54,11 +54,13 @@ class ArtveeScraper:
         writer: AbstractWriter,
         worker_threads: int = 3,
         categories: List[CategoryType] = None,
+        page_urls: List[str] = None,  # Add this parameter
         image_size: ImageSize = ImageSize.STANDARD,
     ) -> None:
         self.writer = writer
         self.workers = concurrent.futures.ThreadPoolExecutor(max_workers=worker_threads)
         self.categories = list(CategoryType) if categories is None else categories
+        self.page_urls = page_urls  # Store the page URLs
         self.image_size = image_size
 
     def __enter__(self):
@@ -68,24 +70,46 @@ class ArtveeScraper:
         self.shutdown(True)
 
     def start(self):
-        logger.info("Starting scraper for categories %s", self.categories)
+        logger.info("Starting scraper")
 
-        for category in self.categories:
-            page_count = ArtveeScraper._num_pages_for_category(category)
+        if self.page_urls:
+            logger.info("Processing specified page URLs")
+            for base_page_url in self.page_urls:
+                logger.info("Processing base page URL %s", base_page_url)
+                page_count = ArtveeScraper._num_pages_for_page_url(base_page_url)
 
-            logger.info("Category %s has %d page(s)", category, page_count)
-            for page in range(1, page_count + 1):
-                logger.info("Processing %s (%d/%d)", category, page, page_count)
-                page_url = f"https://www.artvee.com/c/{category}/page/{page}/?per_page={ArtveeScraper._ITEMS_PER_PAGE}"
-                artwork_list = ArtveeScraper._scrape_artwork_data(
-                    page_url, category.value.capitalize()
-                )
+                logger.info("Base URL %s has %d page(s)", base_page_url, page_count)
+                for page in range(1, page_count + 1):
+                    if page == 1:
+                        page_url = base_page_url.rstrip('/') + '/'
+                    else:
+                        page_url = base_page_url.rstrip('/') + f'/page/{page}/'
 
-                results = self.workers.map(self._worker_task, artwork_list)
+                    logger.info("Processing page URL %s", page_url)
+                    artwork_list = ArtveeScraper._scrape_artwork_data(
+                        page_url, category=None
+                    )
 
-                # Block until all submitted tasks for a page have completed
-                for _ in results:
-                    pass
+                    results = self.workers.map(self._worker_task, artwork_list)
+                    for _ in results:
+                        pass  # Wait for all tasks to complete
+        else:
+            logger.info("Processing categories %s", self.categories)
+            for category in self.categories:
+                page_count = ArtveeScraper._num_pages_for_category(category)
+
+                logger.info("Category %s has %d page(s)", category, page_count)
+                for page in range(1, page_count + 1):
+                    logger.info("Processing %s (%d/%d)", category, page, page_count)
+                    page_url = f"https://www.artvee.com/c/{category}/page/{page}/?per_page={ArtveeScraper._ITEMS_PER_PAGE}"
+                    artwork_list = ArtveeScraper._scrape_artwork_data(
+                        page_url, category.value.capitalize()
+                    )
+
+                    results = self.workers.map(self._worker_task, artwork_list)
+                    for _ in results:
+                        pass  # Wait for all tasks to complete
+
 
     def shutdown(self, wait: bool) -> None:
         self.workers.shutdown(wait=wait)
@@ -197,11 +221,14 @@ class ArtveeScraper:
         return 0
 
     @staticmethod
-    def _scrape_artwork_data(page_url: str, category: str) -> List[Artwork]:
+    def _scrape_artwork_data(page_url: str, category: Optional[str] = None) -> List[Artwork]:
         scraped_artwork = []
 
+        if category is None:
+            category = 'Unknown'  # Set a default category if not provided
+
         try:
-            logger.debug("Retrieving artwork metadata URL %s", page_url)
+            logger.debug("Retrieving artwork metadata from URL %s", page_url)
             website_resp = requests.get(
                 page_url,
                 timeout=(
@@ -221,7 +248,6 @@ class ArtveeScraper:
                 for meta in all_metadata_html:
                     if artwork := ArtveeScraper._parse_metadata_html(meta, category):
                         scraped_artwork.append(artwork)
-
             else:
                 logger.error(
                     "Failed to retrieve website from URL %s; Status Code: %d",
@@ -230,12 +256,13 @@ class ArtveeScraper:
                 )
         except Exception:
             logging.error(
-                "An error occured while processing %s; %s",
+                "An error occurred while processing %s; %s",
                 page_url,
                 traceback.format_exc(),
             )
 
         return scraped_artwork
+
 
     @staticmethod
     def _parse_metadata_html(metadata_html: Tag, category: str) -> Optional[Artwork]:
@@ -268,3 +295,51 @@ class ArtveeScraper:
             )
 
         return None
+
+    @staticmethod
+    def _num_pages_for_page_url(base_page_url: str) -> int:
+        logger.debug("Calculating the number of pages for URL '%s'", base_page_url)
+        try:
+            resp = requests.get(
+                base_page_url,
+                timeout=(
+                    ArtveeScraper._HTTP_CONN_TIMEOUT_SEC,
+                    ArtveeScraper._HTTP_READ_TIMEOUT_SEC,
+                ),
+            )
+
+            if resp.status_code == 200:
+                soup = BeautifulSoup(resp.content, "html.parser")
+                # Find the pagination elements
+                pagination = soup.find("ul", class_="page-numbers")
+                if pagination:
+                    # Get all page number elements (both links and current page span)
+                    page_elements = pagination.find_all(['a', 'span'], class_="page-numbers")
+                    pages = []
+                    for elem in page_elements:
+                        try:
+                            page_num = int(elem.get_text())
+                            pages.append(page_num)
+                        except ValueError:
+                            continue
+                    if pages:
+                        max_page = max(pages)
+                        logger.debug("Found %d pages for URL '%s'", max_page, base_page_url)
+                        return max_page
+                # If pagination not found, assume only one page
+                logger.debug("Pagination not found, assuming 1 page for URL '%s'", base_page_url)
+                return 1
+            else:
+                logger.error(
+                    "Failed to retrieve total number of pages from URL %s; Status Code: %d",
+                    base_page_url,
+                    resp.status_code,
+                )
+        except Exception:
+            logger.error(
+                "An error occurred while retrieving total number of pages from %s; %s",
+                base_page_url,
+                traceback.format_exc(),
+            )
+
+        return 1  # Default to 1 if there's an error
