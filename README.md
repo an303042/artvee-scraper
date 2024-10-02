@@ -2,6 +2,51 @@
 
  **artvee-scraper** is an easy to use command line utility for fetching public domain artwork from https://www.artvee.com.
 
+**TL;DR**
+
+Quickly scrape public domain artwork from [artvee.com](https://www.artvee.com).
+
+## Quick Start
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/your-username/artvee-scraper.git
+   cd artvee-scraper
+   ```
+
+2. **Install dependencies:**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Find the URL you want to scrape:**
+
+   - Example URL: `https://artvee.com/books/tsuki-no-hyakushi-one-hundred-aspects-of-the-moon/`
+
+4. **Run the scraper:**
+
+   ```bash
+   python -m artvee_scraper file-multi metadata_dir images_dir --url <URL_TO_SCRAPE>
+   ```
+
+   - Replace `<URL_TO_SCRAPE>` with the URL you want to scrape.
+   - Replace `metadata_dir` and `images_dir` with the paths to your desired output directories.
+
+**Example Command:**
+
+```bash
+python -m artvee_scraper file-multi meta images --url https://artvee.com/books/tsuki-no-hyakushi-one-hundred-aspects-of-the-moon/
+```
+
+---
+
+**Note:** Ensure you have Python 3.8 or higher installed.
+
+
+
+
 - [Artvee Web-scraper](#artvee-scraper)
   - [Installation](#installation)
   - [Synopsis](#synopsis)
