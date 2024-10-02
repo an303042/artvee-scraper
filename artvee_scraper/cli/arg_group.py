@@ -51,7 +51,7 @@ class ArgGroup(ABC):
             help=self.get_help(),
             description=self.get_description(),
             parents=self.parents,  # Include parent parsers to inherit common arguments
-            add_help=False  # Prevent duplicate help arguments
+            add_help=True  # Allow subparser to have its own --help option
         )
         subparser.set_defaults(command=self.get_name())
 
