@@ -9,12 +9,12 @@ requires = ["beautifulsoup4~=4.12.3", "requests~=2.32.3", "python-slugify~=8.0.4
 
 setup(
     name="artvee-scraper",
-    author="Zach Duclos",
-    author_email="zduclos.github@gmail.com",
+    author="an303042",
+    author_email="an303042@gmail.com",
     description="Fetch public domain artwork from https://www.artvee.com",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/zduclos/artvee-scraper",
+    url="https://github.com/an303042/artvee-scraper",
     packages=find_packages(exclude=["tests*"]),
     include_package_data=True,
     install_requires=requires,
@@ -43,8 +43,8 @@ setup(
     },
     keywords="artvee, artwork, webscraper",
     project_urls={
-        "Bug Reports": "https://github.com/zduclos/artvee-scraper/issues",
+        "Bug Reports": "https://github.com/an303042/artvee-scraper/issues",
         "Funding": "https://artvee.com/donate/",
-        "Source": "https://github.com/zduclos/artvee-scraper",
+        "Source": "https://github.com/an303042/artvee-scraper",
     },
 )
