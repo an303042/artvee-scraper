@@ -3,7 +3,7 @@
 import argparse
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 
 from artvee_scraper.scraper import CategoryType
 
@@ -16,7 +16,7 @@ class ArgGroup(ABC):
         parents (List[argparse.ArgumentParser], optional): List of parent parsers to inherit arguments from.
     """
 
-    def __init__(self, subparsers: argparse._SubParsersAction, parents=None) -> None:
+    def __init__(self, subparsers: argparse._SubParsersAction, parents: Optional[List[argparse.ArgumentParser]] = None) -> None:
         """Constructs a new `ArgGroup` instance."""
         self.subparsers = subparsers
         self.parents = parents  # Store the parent parsers
@@ -41,7 +41,11 @@ class ArgGroup(ABC):
         return None  # Return None if no description is provided
 
     def register(self) -> argparse.ArgumentParser:
-        """Creates a subparser for this command with command-line arguments defined."""
+        """Creates a subparser for this command with command-line arguments defined.
+
+        Returns:
+            argparse.ArgumentParser: The configured argparse subparser.
+        """
         subparser = self.subparsers.add_parser(
             self.get_name(),
             help=self.get_help(),
@@ -60,6 +64,8 @@ class ArgGroup(ABC):
 
 
 class IsInRangeAction(argparse.Action):
+    """Custom argparse Action to check if a value is within a specified range."""
+
     def __init__(self, minInclusive: int, maxInclusive: int, *args, **kwargs):
         self.minInclusive = minInclusive
         self.maxInclusive = maxInclusive
@@ -74,6 +80,8 @@ class IsInRangeAction(argparse.Action):
 
 
 class IsDirAction(argparse.Action):
+    """Custom argparse Action to check if a value is a directory, creating it if necessary."""
+
     def __call__(self, parser, namespace, value, option_string=None):
         path = Path(value)
 
