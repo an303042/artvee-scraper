@@ -2,7 +2,8 @@
 
  **artvee-scraper** is an easy to use command line utility for fetching public domain artwork from https://www.artvee.com.
 
-***TL;DR***
+
+**TL;DR**
 
 Quickly scrape public domain artwork from [artvee.com](https://www.artvee.com).
 
