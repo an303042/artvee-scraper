@@ -2,7 +2,7 @@
 
  **artvee-scraper** is an easy to use command line utility for fetching public domain artwork from https://www.artvee.com.
 
-**TL;DR**
+***TL;DR***
 
 Quickly scrape public domain artwork from [artvee.com](https://www.artvee.com).
 
@@ -45,7 +45,7 @@ python -m artvee_scraper file-multi meta images --url https://artvee.com/books/t
 **Note:** Ensure you have Python 3.8 or higher installed.
 
 
-
+---
 
 - [Artvee Web-scraper](#artvee-scraper)
   - [Installation](#installation)
