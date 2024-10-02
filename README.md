@@ -1,6 +1,6 @@
 # artvee-scraper
 
-**artvee-scraper** is an easy-to-use command-line utility for fetching public domain artwork from [Artvee](https://www.artvee.com). This project is a fork of the original `artvee-scraper` with additional enhancements and installer scripts to streamline the setup process.
+**artvee-scraper** is an easy-to-use command-line utility for fetching public domain artwork from [Artvee](https://www.artvee.com). This project is a fork of the original `artvee-scraper` with additional enhancements and installer scripts to streamline the setup process. All code changes were written by ChatGPT-o1, guided by an303042.
 
 ---
 
