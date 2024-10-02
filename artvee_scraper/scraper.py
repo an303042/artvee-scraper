@@ -108,9 +108,9 @@ class ArtveeScraper:
                     page_url, category.value.capitalize()
                 )
 
-                    results = self.workers.map(self._worker_task, artwork_list)
-                    for _ in results:
-                        pass  # Wait for all tasks to complete
+            results = self.workers.map(self._worker_task, artwork_list)
+            for _ in results:
+                pass  # Wait for all tasks to complete
 
     def shutdown(self, wait: bool) -> None:
         self.workers.shutdown(wait=wait)
