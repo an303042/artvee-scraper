@@ -41,7 +41,7 @@ class JsonFileArgGroup(ArgGroup):
             action="store_true",
             help="Sort JSON keys in alphabetical order",
         )
-        # Do not add common arguments here; they are handled by the parent parser
+        # Common arguments are handled by the parent parser
 
 
 class MultiFileArgGroup(ArgGroup):
@@ -84,4 +84,4 @@ class MultiFileArgGroup(ArgGroup):
             action="store_true",
             help="Sort JSON keys in alphabetical order",
         )
-        # Do not add common arguments here; they are handled by the parent parser
+        # Common arguments are handled by the parent parser
