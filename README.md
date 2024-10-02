@@ -20,11 +20,10 @@ Ensure that you have the following installed on your system:
 Open your terminal or command prompt and clone the `artvee-scraper` repository:
 
 ~~~bash
-git clone https://github.com/yourusername/artvee-scraper.git
+git clone https://github.com/an303042/artvee-scraper.git
 cd artvee-scraper
 ~~~
 
-*Note: Replace `yourusername` with the actual GitHub username if different.*
 
 ### **3. Run the Installer**
 
