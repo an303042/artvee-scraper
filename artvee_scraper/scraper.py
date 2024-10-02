@@ -72,7 +72,7 @@ class ArtveeScraper:
         self.shutdown(True)
 
     def start(self):
-    logger.info("Starting scraper")
+        logger.info("Starting scraper")
 
     if self.page_urls:
         logger.info("Processing specified page URLs")
