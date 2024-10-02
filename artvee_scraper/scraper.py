@@ -54,7 +54,9 @@ class ArtveeScraper:
         writer: AbstractWriter,
         worker_threads: int = 3,
         categories: List[CategoryType] = None,
+
         page_urls: List[str] = None,  # Add this parameter
+
         image_size: ImageSize = ImageSize.STANDARD,
     ) -> None:
         self.writer = writer
@@ -98,18 +100,17 @@ class ArtveeScraper:
             for category in self.categories:
                 page_count = ArtveeScraper._num_pages_for_category(category)
 
-                logger.info("Category %s has %d page(s)", category, page_count)
-                for page in range(1, page_count + 1):
-                    logger.info("Processing %s (%d/%d)", category, page, page_count)
-                    page_url = f"https://www.artvee.com/c/{category}/page/{page}/?per_page={ArtveeScraper._ITEMS_PER_PAGE}"
-                    artwork_list = ArtveeScraper._scrape_artwork_data(
-                        page_url, category.value.capitalize()
-                    )
+            logger.info("Category %s has %d page(s)", category, page_count)
+            for page in range(1, page_count + 1):
+                logger.info("Processing %s (%d/%d)", category, page, page_count)
+                page_url = f"https://www.artvee.com/c/{category}/page/{page}/?per_page={ArtveeScraper._ITEMS_PER_PAGE}"
+                artwork_list = ArtveeScraper._scrape_artwork_data(
+                    page_url, category.value.capitalize()
+                )
 
                     results = self.workers.map(self._worker_task, artwork_list)
                     for _ in results:
                         pass  # Wait for all tasks to complete
-
 
     def shutdown(self, wait: bool) -> None:
         self.workers.shutdown(wait=wait)
