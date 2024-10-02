@@ -1,15 +1,16 @@
+# log_arg_group.py
+
 import argparse
 
 from artvee_scraper.writer.writer_factory import WriterType
-
-from .arg_group import ArgGroup, IsInRangeAction
+from artvee_scraper.cli.arg_group import ArgGroup, IsInRangeAction
 
 
 class JsonLogArgGroup(ArgGroup):
-    """The group of command line arguments associated with the `JsonLogWriter`"""
+    """The group of command line arguments associated with the `JsonLogWriter`."""
 
-    def __init__(self, subparsers: argparse._SubParsersAction) -> None:
-        super().__init__(subparsers)
+    def __init__(self, subparsers: argparse._SubParsersAction, parents=None) -> None:
+        super().__init__(subparsers, parents=parents)
 
     def get_name(self) -> str:
         return WriterType.JSON_LOG.writer_name
@@ -41,3 +42,4 @@ class JsonLogArgGroup(ArgGroup):
             action="store_true",
             help="Include image bytes in the output",
         )
+        # Do not add common arguments here; they are handled by the parent parser
