@@ -74,43 +74,43 @@ class ArtveeScraper:
     def start(self):
         logger.info("Starting scraper")
 
-    if self.page_urls:
-        logger.info("Processing specified page URLs")
-        for base_page_url in self.page_urls:
-            logger.info("Processing base page URL %s", base_page_url)
-            page_count = ArtveeScraper._num_pages_for_page_url(base_page_url)
-
-            logger.info("Base URL %s has %d page(s)", base_page_url, page_count)
-            for page in range(1, page_count + 1):
-                if page == 1:
-                    page_url = base_page_url.rstrip('/') + '/'
-                else:
-                    page_url = base_page_url.rstrip('/') + f'/page/{page}/'
-
-                logger.info("Processing page URL %s", page_url)
-                artwork_list = ArtveeScraper._scrape_artwork_data(
-                    page_url, category=None
-                )
-
-                results = self.workers.map(self._worker_task, artwork_list)
-                for _ in results:
-                    pass  # Wait for all tasks to complete
-    else:
-        logger.info("Processing categories %s", self.categories)
-        for category in self.categories:
-            page_count = ArtveeScraper._num_pages_for_category(category)
-
-            logger.info("Category %s has %d page(s)", category, page_count)
-            for page in range(1, page_count + 1):
-                logger.info("Processing %s (%d/%d)", category, page, page_count)
-                page_url = f"https://www.artvee.com/c/{category}/page/{page}/?per_page={ArtveeScraper._ITEMS_PER_PAGE}"
-                artwork_list = ArtveeScraper._scrape_artwork_data(
-                    page_url, category.value.capitalize()
-                )
-
-                results = self.workers.map(self._worker_task, artwork_list)
-                for _ in results:
-                    pass  # Wait for all tasks to complete
+        if self.page_urls:
+            logger.info("Processing specified page URLs")
+            for base_page_url in self.page_urls:
+                logger.info("Processing base page URL %s", base_page_url)
+                page_count = ArtveeScraper._num_pages_for_page_url(base_page_url)
+    
+                logger.info("Base URL %s has %d page(s)", base_page_url, page_count)
+                for page in range(1, page_count + 1):
+                    if page == 1:
+                        page_url = base_page_url.rstrip('/') + '/'
+                    else:
+                        page_url = base_page_url.rstrip('/') + f'/page/{page}/'
+    
+                    logger.info("Processing page URL %s", page_url)
+                    artwork_list = ArtveeScraper._scrape_artwork_data(
+                        page_url, category=None
+                    )
+    
+                    results = self.workers.map(self._worker_task, artwork_list)
+                    for _ in results:
+                        pass  # Wait for all tasks to complete
+        else:
+            logger.info("Processing categories %s", self.categories)
+            for category in self.categories:
+                page_count = ArtveeScraper._num_pages_for_category(category)
+    
+                logger.info("Category %s has %d page(s)", category, page_count)
+                for page in range(1, page_count + 1):
+                    logger.info("Processing %s (%d/%d)", category, page, page_count)
+                    page_url = f"https://www.artvee.com/c/{category}/page/{page}/?per_page={ArtveeScraper._ITEMS_PER_PAGE}"
+                    artwork_list = ArtveeScraper._scrape_artwork_data(
+                        page_url, category.value.capitalize()
+                    )
+    
+                    results = self.workers.map(self._worker_task, artwork_list)
+                    for _ in results:
+                        pass  # Wait for all tasks to complete
 
     def shutdown(self, wait: bool) -> None:
         self.workers.shutdown(wait=wait)
